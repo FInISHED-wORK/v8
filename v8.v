@@ -481,7 +481,7 @@ fn (mut ctx Chip8) step() {
 				// 	Sets the sound timer to VX.
 				// i.e: FX18
 				vx := (inst >> 8) & 0xF
-				ctx.debug('Save sound timer to register ${vx}: TODO: Implement proper timer')
+				ctx.debug('Save sound timer to register ${vx}')
 				ctx.registers[vx] = 0
 				ctx.pc += 2
 			} else if action == 0x1E {
@@ -549,6 +549,12 @@ fn (mut ctx Chip8) debug(msg string) {
 	}
 }
 
-// fixme 23/01/06: Implement or remove the Chip8::halted
-// fixme 23/01/06: Implement sound
-// fixme 23/01/07: Implement proper cpu speed instead of hardcoding how many instructions we want per frame
+// TODO(#1): Implement or remove the Chip8::halted
+// TODO(#2): Implement sound
+
+// TODO(#3): Implement proper cpu speed instead of hardcoding how many instructions we want per frame
+// 	Currently the cycles per frame is set on 30. This should be calculated using the clock speed, which was 1.8~ for the RCA 1802
+
+// TODO(#4): Implement proper sound timer
+// 	Currently we set the vX to 0 when asked to save the timer
+// 	This should be fixed after the sound is implemented
