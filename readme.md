@@ -4,7 +4,7 @@ Almost complete Chip8 emulator written in V using gg module as a graphic interfa
 
 ## How to:
 
-ATM the miniaudio wrapper has a bug that is not building when imported, to fix this you need to apply a path after cloning the repo.
+ATM the miniaudio wrapper has a bug that is not building when imported, to fix this you need to apply a patch after cloning the repo.
 - Issue: https://github.com/Larpon/miniaudio/issues/13
 
 
@@ -19,7 +19,7 @@ v8 run v8.v [rom_path] || v v8.v && ./v8 [rom_path]
 
 - [x] All opcodes
 - [x] Display
-- [ ] Sound
+- [x] Sound
 - [x] Keypad
 - [x] Font
 - [x] Memory
@@ -28,6 +28,7 @@ v8 run v8.v [rom_path] || v v8.v && ./v8 [rom_path]
 - [ ] Super-Chip support
 - [ ] XO-Chip support
 - [ ] Quirks
+- [ ] Better CPU clock speed emulation
 
 ## Third party ROMS provided in the repo:
 
