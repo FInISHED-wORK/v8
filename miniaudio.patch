@@ -1,0 +1,4 @@
+10405c10405
+< pub const sound_source_channel_count = 0xFFFFFFFF
+---
+> pub const sound_source_channel_count = u32(0xFFFFFFFF)
