@@ -4,6 +4,7 @@ import os
 import rand
 import gg
 import gx
+import miniaudio
 
 struct Chip8 {
 mut:
@@ -14,6 +15,7 @@ mut:
 	address        u16
 	pc             u16
 	delay_timer    u8
+	sound_timer	   u8
 	halted         bool
 	v_key          i16
 	keys           map[u8]u8
@@ -22,6 +24,7 @@ mut:
 	current_inst   u16
 	log_debug      bool        = true
 	gg             &gg.Context = unsafe { nil }
+	miniaudio_engine &miniaudio.Engine = unsafe { nil }
 }
 
 fn main() {
@@ -44,6 +47,7 @@ fn main() {
 		address: 0
 		pc: 0x200
 		delay_timer: 0
+		sound_timer: 0
 		halted: false
 		v_key: -1
 		keys: map[u8]u8{}
@@ -80,7 +84,16 @@ fn main() {
 		event_fn: on_event
 		user_data: v8
 	)
+
+	v8.miniaudio_engine = &miniaudio.Engine{}
+	result := miniaudio.engine_init(miniaudio.null, v8.miniaudio_engine)
+	if result != .success {
+		panic('Failed to initialize audio engine.')
+	}
+
 	v8.gg.run()
+
+	miniaudio.engine_uninit(v8.miniaudio_engine)
 }
 
 fn frame(mut ctx Chip8) {
@@ -89,6 +102,13 @@ fn frame(mut ctx Chip8) {
 	// to 60Hz rigth?
 	if ctx.delay_timer > 0 {
 		ctx.delay_timer--
+	}
+
+	if ctx.sound_timer > 0 {
+		ctx.sound_timer--
+		if miniaudio.engine_play_sound(ctx.miniaudio_engine, "./beep.wav".str, miniaudio.null) != .success {
+			panic("Failed to play sound ./beep.wav")
+		}		
 	}
 
 	for _ in 0 .. 30 {
@@ -481,8 +501,8 @@ fn (mut ctx Chip8) step() {
 				// 	Sets the sound timer to VX.
 				// i.e: FX18
 				vx := (inst >> 8) & 0xF
-				ctx.debug('Save sound timer to register ${vx}')
-				ctx.registers[vx] = 0
+				ctx.sound_timer = ctx.registers[vx] 
+				ctx.debug('Set sound timer to ${ctx.registers[vx]}')
 				ctx.pc += 2
 			} else if action == 0x1E {
 				// Adds VX to I. VF is not affected.
@@ -550,11 +570,6 @@ fn (mut ctx Chip8) debug(msg string) {
 }
 
 // TODO(#1): Implement or remove the Chip8::halted
-// TODO(#2): Implement sound
 
 // TODO(#3): Implement proper cpu speed instead of hardcoding how many instructions we want per frame
 // 	Currently the cycles per frame is set on 30. This should be calculated using the clock speed, which was 1.8~ for the RCA 1802
-
-// TODO(#4): Implement proper sound timer
-// 	Currently we set the vX to 0 when asked to save the timer
-// 	This should be fixed after the sound is implemented
