@@ -570,6 +570,6 @@ fn (mut ctx Chip8) debug(msg string) {
 }
 
 // TODO(#1): Implement or remove the Chip8::halted
-
+// TODO(#6): Add configuration arguments
 // TODO(#3): Implement proper cpu speed instead of hardcoding how many instructions we want per frame
 // 	Currently the cycles per frame is set on 30. This should be calculated using the clock speed, which was 1.8~ for the RCA 1802
