@@ -8,29 +8,42 @@ import miniaudio
 
 struct Chip8 {
 mut:
-	mem            []u8
-	registers      []u8
-	stack          []u16
-	stack_ptr      u16
-	address        u16
-	pc             u16
-	delay_timer    u8
-	sound_timer	   u8
-	halted         bool
-	v_key          i16
-	keys           map[u8]u8
-	pressed_keys   map[i16]bool
-	display_buffer [][]int
-	current_inst   u16
-	log_debug      bool        = true
-	gg             &gg.Context = unsafe { nil }
+	mem              []u8
+	registers        []u8
+	stack            []u16
+	stack_ptr        u16
+	address          u16
+	pc               u16
+	delay_timer      u8
+	sound_timer      u8
+	halted           bool
+	v_key            i16
+	keys             map[u8]u8
+	pressed_keys     map[i16]bool
+	display_buffer   [][]int
+	current_inst     u16
+	log_debug        bool              = true
+	gg               &gg.Context       = unsafe { nil }
 	miniaudio_engine &miniaudio.Engine = unsafe { nil }
 }
 
 fn main() {
+	mut log_debug := false
+
 	if os.args.len < 2 {
-		println('Usage: ./v8 [path to chip8 ROM]')
+		println('Usage: ./v8 [path to chip8 ROM] [options]')
+		println('   Options:')
+		println('       -d: prints rom execution debug')
 		exit(1)
+	} else if os.args.len == 3 {
+		if os.args[2] == '-d' {
+			log_debug = true
+		} else {
+			println('Usage: ./v8 [path to chip8 ROM] [options]')
+			println('   Options:')
+			println('       -d: prints rom execution debug')
+			exit(1)
+		}
 	}
 
 	mut v8 := &Chip8{
@@ -53,6 +66,7 @@ fn main() {
 		keys: map[u8]u8{}
 		pressed_keys: map[i16]bool{}
 		display_buffer: [][]int{len: 64, init: []int{len: 32}}
+		log_debug: log_debug
 		gg: 0
 	}
 
@@ -106,13 +120,13 @@ fn frame(mut ctx Chip8) {
 
 	if ctx.sound_timer > 0 {
 		ctx.sound_timer--
-		if miniaudio.engine_play_sound(ctx.miniaudio_engine, "./beep.wav".str, miniaudio.null) != .success {
-			panic("Failed to play sound ./beep.wav")
-		}		
+		if miniaudio.engine_play_sound(ctx.miniaudio_engine, './beep.wav'.str, miniaudio.null) != .success {
+			panic('Failed to play sound ./beep.wav')
+		}
 	}
 
 	// Since this was a experiment project and I don't pretend this to
-	// be a super accurate emulator, the amount of cycles per frames 
+	// be a super accurate emulator, the amount of cycles per frames
 	// was chossen after reading some posts about emulating the CPU speed
 	// for the Chip 8
 	for _ in 0 .. 14 {
@@ -505,7 +519,7 @@ fn (mut ctx Chip8) step() {
 				// 	Sets the sound timer to VX.
 				// i.e: FX18
 				vx := (inst >> 8) & 0xF
-				ctx.sound_timer = ctx.registers[vx] 
+				ctx.sound_timer = ctx.registers[vx]
 				ctx.debug('Set sound timer to ${ctx.registers[vx]}')
 				ctx.pc += 2
 			} else if action == 0x1E {
@@ -574,4 +588,3 @@ fn (mut ctx Chip8) debug(msg string) {
 }
 
 // TODO(#1): Implement or remove the Chip8::halted
-// TODO(#6): Add configuration arguments
