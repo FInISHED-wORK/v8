@@ -5,7 +5,7 @@ Almost complete Chip8 emulator written in V using gg module as a graphic interfa
 ## How to:
 
 ```
-git clone --recursive https://github.com/marcosantos98/v8.git
+git clone --recursive https://github.com/FInISHED-wORK/v8.git
 cd v8
 v8 run v8.v [rom_path] || v v8.v && ./v8 [rom_path]
 ```
